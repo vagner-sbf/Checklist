@@ -59,7 +59,6 @@ img {
 <h2>Checklist de Equipamentos</h2>
 
 <div class="card">
-
 <label>Loja</label>
 <input type="text" id="loja">
 
@@ -70,11 +69,10 @@ img {
 <input type="text" id="data" readonly>
 
 <label>Início do Atendimento</label>
-<input type="text" id="inicio" placeholder="Digite data e hora de início">
+<input type="text" id="inicio">
 
 <label>Término do Atendimento</label>
-<input type="text" id="fim" placeholder="Digite data e hora de término">
-
+<input type="text" id="fim">
 </div>
 
 <div id="equipamentos"></div>
@@ -87,10 +85,8 @@ img {
 <script>
 let contador = 0;
 
-/* DATA AUTOMÁTICA */
 document.getElementById("data").value = new Date().toLocaleString();
 
-/* ADICIONAR EQUIPAMENTO */
 function adicionarEquipamento() {
   contador++;
 
@@ -129,7 +125,6 @@ function adicionarEquipamento() {
   adicionarFoto(contador);
 }
 
-/* ADICIONAR FOTO */
 function adicionarFoto(id) {
   const container = document.getElementById("fotos_" + id);
   const index = container.children.length;
@@ -144,7 +139,6 @@ function adicionarFoto(id) {
   container.appendChild(div);
 }
 
-/* PREVIEW IMAGEM */
 function previewImagem(event, id) {
   const img = document.getElementById("preview_" + id);
   const file = event.target.files[0];
@@ -161,29 +155,99 @@ function previewImagem(event, id) {
   }
 }
 
-/* CONSOLIDAR E IMPRIMIR */
 function imprimirChecklist() {
 
   let html = `
-    <html>
-    <head>
-      <title>Checklist</title>
-      <style>
-        body { font-family: Arial; padding: 20px; }
-        h2 { text-align: center; }
-        img { max-width: 100%; margin-top: 10px; }
-        hr { margin: 20px 0; }
-      </style>
-    </head>
-    <body>
+  <html>
+  <head>
+  <style>
 
-    <h2>Checklist de Equipamentos</h2>
+    @page {
+      margin: 100px 40px 60px 40px;
+    }
 
-    <p><strong>Loja:</strong> ${document.getElementById("loja").value}</p>
-    <p><strong>Responsável:</strong> ${document.getElementById("responsavel").value}</p>
-    <p><strong>Data:</strong> ${document.getElementById("data").value}</p>
-    <p><strong>Início:</strong> ${document.getElementById("inicio").value}</p>
-    <p><strong>Término:</strong> ${document.getElementById("fim").value}</p>
+    body {
+      font-family: Arial;
+    }
+
+    header {
+      position: fixed;
+      top: -80px;
+      left: 0;
+      right: 0;
+      height: 60px;
+      text-align: center;
+      border-bottom: 2px solid #000;
+    }
+
+    header img {
+      height: 40px;
+      float: left;
+    }
+
+    header h2 {
+      margin: 0;
+      line-height: 60px;
+    }
+
+    footer {
+      position: fixed;
+      bottom: -40px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .pagenum:before {
+      content: counter(page);
+    }
+
+    .bloco {
+      page-break-inside: avoid;
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .grid img {
+      width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+      border: 1px solid #ccc;
+      padding: 5px;
+    }
+
+    hr {
+      margin: 20px 0;
+    }
+
+  </style>
+  </head>
+
+  <body>
+
+  <header>
+    <img src="https://via.placeholder.com/150x40?text=LOGO">
+    <h2>Relatório Técnico de Equipamentos</h2>
+  </header>
+
+  <footer>
+    Página <span class="pagenum"></span>
+  </footer>
+
+  <main>
+
+  <p><strong>Loja:</strong> ${document.getElementById("loja").value}</p>
+  <p><strong>Responsável:</strong> ${document.getElementById("responsavel").value}</p>
+  <p><strong>Data:</strong> ${document.getElementById("data").value}</p>
+  <p><strong>Início:</strong> ${document.getElementById("inicio").value}</p>
+  <p><strong>Término:</strong> ${document.getElementById("fim").value}</p>
   `;
 
   const equipamentos = document.querySelectorAll("#equipamentos .card");
@@ -195,6 +259,8 @@ function imprimirChecklist() {
     const obs = eq.querySelector(".obs").value;
     const tecnico = eq.querySelector(".tecnico").value;
     const analista = eq.querySelector(".analista").value;
+
+    html += `<div class="bloco">`;
 
     html += `
       <hr>
@@ -208,15 +274,22 @@ function imprimirChecklist() {
 
     const imgs = eq.querySelectorAll("img");
 
-    imgs.forEach(img => {
-      if (img.src) {
-        html += `<img src="${img.src}">`;
-      }
-    });
+    if (imgs.length > 0) {
+      html += `<div class="grid">`;
 
+      imgs.forEach(img => {
+        if (img.src) {
+          html += `<img src="${img.src}">`;
+        }
+      });
+
+      html += `</div>`;
+    }
+
+    html += `</div>`;
   });
 
-  html += `</body></html>`;
+  html += `</main></body></html>`;
 
   const win = window.open("", "_blank");
   win.document.write(html);
@@ -224,7 +297,6 @@ function imprimirChecklist() {
   win.print();
 }
 
-/* INICIA COM 1 EQUIPAMENTO */
 adicionarEquipamento();
 
 </script>
