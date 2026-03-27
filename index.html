@@ -7,7 +7,7 @@ function imprimirChecklist() {
   equipamentos.forEach((eq, i) => {
 
     conteudo += `
-      <div style="margin-bottom: 20px;">
+      <div class="equipamento-bloco ${i === 0 ? 'primeiro' : ''}">
         <hr>
         <h3>Equipamento ${i + 1}</h3>
         <p><strong>Nome:</strong> ${eq.querySelector(".nome").value}</p>
@@ -20,8 +20,7 @@ function imprimirChecklist() {
     eq.querySelectorAll("img").forEach(img => {
       if (img.src) {
         conteudo += `
-          <img src="${img.src}" 
-          style="display:block;margin:15px auto;max-width:550px;max-height:450px;border:1px solid #ccc;">
+          <img src="${img.src}">
         `;
       }
     });
@@ -35,7 +34,10 @@ function imprimirChecklist() {
     <html>
     <head>
       <style>
-        body { font-family: Arial; margin:0; }
+        body {
+          font-family: Arial;
+          margin: 0;
+        }
 
         header {
           position: fixed;
@@ -66,18 +68,28 @@ function imprimirChecklist() {
           content: counter(page);
         }
 
-        h3 {
-          margin-top: 10px;
-        }
-
-        /* 🔥 ESSENCIAL: evitar quebra logo após os dados */
         .dados {
           margin-bottom: 10px;
         }
 
-        /* 🚀 Garante que o primeiro bloco não pule */
-        .equipamento:first-child {
-          page-break-before: auto;
+        /* 🔥 CORREÇÃO PRINCIPAL */
+        .equipamento-bloco {
+          margin-bottom: 20px;
+          page-break-inside: auto;
+          break-inside: auto;
+        }
+
+        /* 🚀 GARANTE QUE O PRIMEIRO NÃO PULE */
+        .primeiro {
+          page-break-before: avoid !important;
+          break-before: avoid !important;
+        }
+
+        img {
+          display: block;
+          margin: 15px auto;
+          max-width: 500px;
+          max-height: 400px;
         }
 
       </style>
@@ -91,12 +103,12 @@ function imprimirChecklist() {
 
       <main>
 
-        <!-- ✅ DADOS SOMENTE NA PRIMEIRA PÁGINA -->
+        <!-- ✅ DADOS PRIMEIRA PÁGINA -->
         <div class="dados">
           <p><strong>Projeto:</strong> REFIT</p>
-          <p><strong>Loja:</strong> 123</p>
+          <p><strong>Loja:</strong> CE123</p>
           <p><strong>Responsável:</strong> Fulano</p>
-          <p><strong>Data:</strong> 27/03/2026, 10:03:39</p>
+          <p><strong>Data:</strong> 27/03/2026, 10:10:04</p>
           <p><strong>Início:</strong> 01/01/2026</p>
           <p><strong>Término:</strong> 03/02/2026</p>
         </div>
