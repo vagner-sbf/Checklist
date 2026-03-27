@@ -59,6 +59,10 @@ img {
 <h2>Checklist de Equipamentos</h2>
 
 <div class="card">
+
+<label>Projeto</label>
+<input type="text" id="projeto">
+
 <label>Loja</label>
 <input type="text" id="loja">
 
@@ -73,6 +77,7 @@ img {
 
 <label>Término do Atendimento</label>
 <input type="text" id="fim">
+
 </div>
 
 <div id="equipamentos"></div>
@@ -121,7 +126,6 @@ function adicionarEquipamento() {
   `;
 
   document.getElementById("equipamentos").appendChild(div);
-
   adicionarFoto(contador);
 }
 
@@ -145,12 +149,10 @@ function previewImagem(event, id) {
 
   if (file) {
     const reader = new FileReader();
-
     reader.onload = function(e) {
       img.src = e.target.result;
       img.style.display = "block";
     };
-
     reader.readAsDataURL(file);
   }
 }
@@ -180,11 +182,6 @@ function imprimirChecklist() {
       border-bottom: 2px solid #000;
     }
 
-    header img {
-      height: 40px;
-      float: left;
-    }
-
     header h2 {
       margin: 0;
       line-height: 60px;
@@ -208,16 +205,11 @@ function imprimirChecklist() {
       margin-bottom: 20px;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .grid img {
-      width: 100%;
-      max-height: 200px;
+    .foto {
+      display: block;
+      margin: 15px auto;
+      max-width: 500px;
+      max-height: 400px;
       object-fit: contain;
       border: 1px solid #ccc;
       padding: 5px;
@@ -233,7 +225,6 @@ function imprimirChecklist() {
   <body>
 
   <header>
-    <img src="https://via.placeholder.com/150x40?text=LOGO">
     <h2>Relatório Técnico de Equipamentos</h2>
   </header>
 
@@ -243,6 +234,7 @@ function imprimirChecklist() {
 
   <main>
 
+  <p><strong>Projeto:</strong> ${document.getElementById("projeto").value}</p>
   <p><strong>Loja:</strong> ${document.getElementById("loja").value}</p>
   <p><strong>Responsável:</strong> ${document.getElementById("responsavel").value}</p>
   <p><strong>Data:</strong> ${document.getElementById("data").value}</p>
@@ -274,17 +266,11 @@ function imprimirChecklist() {
 
     const imgs = eq.querySelectorAll("img");
 
-    if (imgs.length > 0) {
-      html += `<div class="grid">`;
-
-      imgs.forEach(img => {
-        if (img.src) {
-          html += `<img src="${img.src}">`;
-        }
-      });
-
-      html += `</div>`;
-    }
+    imgs.forEach(img => {
+      if (img.src) {
+        html += `<img src="${img.src}" class="foto">`;
+      }
+    });
 
     html += `</div>`;
   });
