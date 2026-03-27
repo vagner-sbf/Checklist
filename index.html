@@ -1,122 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Checklist</title>
+
+<style>
+body { font-family: Arial; margin: 20px; background: #f4f4f4; }
+
+.container {
+  max-width: 800px;
+  margin: auto;
+}
+
+.card {
+  background: #fff;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+}
+
+button {
+  padding: 10px;
+  margin-top: 10px;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+}
+
+.add { background: green; color: white; }
+.print { background: blue; color: white; }
+
+img {
+  max-width: 100%;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Checklist</h2>
+
+<div class="card">
+<label>Projeto</label>
+<input id="projeto">
+
+<label>Loja</label>
+<input id="loja">
+
+<label>Responsável</label>
+<input id="responsavel">
+
+<label>Data</label>
+<input id="data" readonly>
+
+<label>Início</label>
+<input id="inicio">
+
+<label>Término</label>
+<input id="fim">
+</div>
+
+<div id="equipamentos"></div>
+
+<button class="add" onclick="addEq()">+ Equipamento</button>
+<button class="print" onclick="printar()">Consolidar / Imprimir</button>
+
+</div>
+
 <script>
-function imprimirChecklist() {
+document.getElementById("data").value = new Date().toLocaleString();
 
-  const equipamentos = document.querySelectorAll(".equipamento");
-  let conteudo = "";
+let count = 0;
 
-  equipamentos.forEach((eq, i) => {
+function addEq() {
+  count++;
 
-    conteudo += `
-      <div class="equipamento-bloco">
-        <hr>
-        <h3>Equipamento ${i + 1}</h3>
-        <p><strong>Nome:</strong> ${eq.querySelector(".nome").value}</p>
-        <p><strong>Status:</strong> ${eq.querySelector(".status").value}</p>
-        <p><strong>Observações:</strong> ${eq.querySelector(".obs").value}</p>
-        <p><strong>Técnico:</strong> ${eq.querySelector(".tecnico").value}</p>
-        <p><strong>Analista:</strong> ${eq.querySelector(".analista").value}</p>
+  const div = document.createElement("div");
+  div.className = "card";
+
+  div.innerHTML = `
+    <h3>Equipamento ${count}</h3>
+    <input placeholder="Nome" class="nome">
+
+    <select class="status">
+      <option>OK</option>
+      <option>Problema</option>
+    </select>
+
+    <input type="file" onchange="preview(event,this)">
+    <img style="display:none">
+
+    <textarea placeholder="Observação" class="obs"></textarea>
+  `;
+
+  document.getElementById("equipamentos").appendChild(div);
+}
+
+function preview(e, input) {
+  const img = input.nextElementSibling;
+  const file = e.target.files[0];
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      img.src = ev.target.result;
+      img.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function printar() {
+
+  const eqs = document.querySelectorAll(".card");
+  let html = "";
+
+  eqs.forEach((e,i) => {
+    if(i === 0) return;
+
+    html += `
+      <h3>Equipamento ${i}</h3>
+      <p>${e.querySelector(".nome")?.value || ""}</p>
+      <p>${e.querySelector(".status")?.value || ""}</p>
+      <p>${e.querySelector(".obs")?.value || ""}</p>
     `;
 
-    eq.querySelectorAll("img").forEach(img => {
-      if (img.src) {
-        conteudo += `<img src="${img.src}">`;
-      }
-    });
-
-    conteudo += `</div>`;
+    const img = e.querySelector("img");
+    if(img && img.src) {
+      html += `<img src="${img.src}" style="max-width:400px">`;
+    }
   });
 
-  const janela = window.open('', '_blank');
+  const w = window.open();
 
-  janela.document.write(`
+  w.document.write(`
     <html>
-    <head>
-      <style>
-        body {
-          font-family: Arial;
-          margin: 0;
-        }
+    <body style="font-family:Arial">
 
-        /* ✅ HEADER EM TODAS AS PÁGINAS */
-        header {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 110px;
-          border-bottom: 2px solid #000;
-          background: #fff;
-          padding: 10px 20px;
-          font-size: 13px;
-        }
+    <h2 style="text-align:center">Relatório Técnico</h2>
 
-        header h2 {
-          text-align: center;
-          margin: 0 0 5px 0;
-        }
+    <p>Projeto: ${projeto.value}</p>
+    <p>Loja: ${loja.value}</p>
+    <p>Responsável: ${responsavel.value}</p>
+    <p>Data: ${data.value}</p>
+    <p>Início: ${inicio.value}</p>
+    <p>Término: ${fim.value}</p>
 
-        main {
-          margin-top: 120px;
-          padding: 15px;
-        }
+    <hr>
 
-        footer {
-          position: fixed;
-          bottom: 0;
-          right: 20px;
-          font-size: 12px;
-        }
-
-        .page-number:after {
-          content: counter(page);
-        }
-
-        .equipamento-bloco {
-          margin-bottom: 20px;
-          page-break-inside: auto;
-        }
-
-        img {
-          display: block;
-          margin: 15px auto;
-          max-width: 500px;
-          max-height: 400px;
-        }
-
-      </style>
-    </head>
-
-    <body>
-
-      <!-- ✅ AGORA REPETE EM TODAS AS PÁGINAS -->
-      <header>
-        <h2>Relatório Técnico de Equipamentos</h2>
-
-        <p><strong>Projeto:</strong> REFIT</p>
-        <p><strong>Loja:</strong> CE123</p>
-        <p><strong>Responsável:</strong> Fulano</p>
-        <p><strong>Data:</strong> 27/03/2026, 10:10:04</p>
-        <p><strong>Início:</strong> 01/01/2026</p>
-        <p><strong>Término:</strong> 03/02/2026</p>
-      </header>
-
-      <main>
-        ${conteudo}
-      </main>
-
-      <footer>
-        Página <span class="page-number"></span>
-      </footer>
+    ${html}
 
     </body>
     </html>
   `);
 
-  janela.document.close();
+  w.document.close();
 
-  setTimeout(() => {
-    janela.print();
-  }, 500);
+  setTimeout(()=>w.print(),500);
 }
+
+addEq();
 </script>
-<!-- atualização -->
+
+</body>
+</html>
