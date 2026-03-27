@@ -55,11 +55,8 @@ function imprimirChecklist() {
         footer {
           position: fixed;
           bottom: 0;
-          left: 0;
-          right: 0;
-          text-align: right;
+          right: 20px;
           font-size: 12px;
-          border-top: 1px solid #000;
         }
 
         .page-number:after {
@@ -76,13 +73,14 @@ function imprimirChecklist() {
 
     <body>
 
+      <!-- ✅ APENAS CABEÇALHO -->
       <header>
         Relatório Técnico de Equipamentos
       </header>
 
       <main>
 
-        <!-- ✅ DADOS APENAS NA PRIMEIRA PÁGINA -->
+        <!-- ✅ SOMENTE NA PRIMEIRA PÁGINA -->
         <div class="primeira-pagina">
           <p><strong>Projeto:</strong> REFIT</p>
           <p><strong>Loja:</strong> 238</p>
@@ -93,11 +91,11 @@ function imprimirChecklist() {
           <hr>
         </div>
 
-        <!-- ✅ CONTEÚDO DINÂMICO -->
         ${conteudo}
 
       </main>
 
+      <!-- ✅ AGORA SÓ PAGINAÇÃO -->
       <footer>
         Página <span class="page-number"></span>
       </footer>
