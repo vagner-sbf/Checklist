@@ -1,291 +1,116 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>Checklist de Equipamentos</title>
-
-<style>
-body {
-  font-family: Arial;
-  background: #f4f4f4;
-  margin: 20px;
-}
-
-.container {
-  max-width: 800px;
-  margin: auto;
-}
-
-.card {
-  background: #fff;
-  padding: 15px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-}
-
-label {
-  font-weight: bold;
-  display: block;
-  margin-top: 10px;
-}
-
-input, select, textarea {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-}
-
-button {
-  margin-top: 10px;
-  padding: 12px;
-  border: none;
-  cursor: pointer;
-}
-
-.add-btn { background: green; color: white; width: 100%; }
-.print-btn { background: #007bff; color: white; width: 100%; }
-
-img {
-  max-width: 100%;
-  margin-top: 10px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<h2>Checklist de Equipamentos</h2>
-
-<div class="card">
-
-<label>Projeto</label>
-<input type="text" id="projeto">
-
-<label>Loja</label>
-<input type="text" id="loja">
-
-<label>Responsável</label>
-<input type="text" id="responsavel">
-
-<label>Data</label>
-<input type="text" id="data" readonly>
-
-<label>Início do Atendimento</label>
-<input type="text" id="inicio">
-
-<label>Término do Atendimento</label>
-<input type="text" id="fim">
-
-</div>
-
-<div id="equipamentos"></div>
-
-<button class="add-btn" onclick="adicionarEquipamento()">+ Equipamento</button>
-<button class="print-btn" onclick="imprimirChecklist()">Consolidar / Imprimir</button>
-
-</div>
-
 <script>
-let contador = 0;
-
-document.getElementById("data").value = new Date().toLocaleString();
-
-function adicionarEquipamento() {
-  contador++;
-
-  const div = document.createElement("div");
-  div.classList.add("card");
-
-  div.innerHTML = `
-    <h3>Equipamento ${contador}</h3>
-
-    <label>Nome</label>
-    <input type="text" class="nome">
-
-    <label>Status</label>
-    <select class="status">
-      <option>Funcionando</option>
-      <option>Com problema</option>
-      <option>Não funciona</option>
-    </select>
-
-    <label>Fotos</label>
-    <div id="fotos_${contador}"></div>
-    <button type="button" onclick="adicionarFoto(${contador})">+ Foto</button>
-
-    <label>Observações</label>
-    <textarea class="obs"></textarea>
-
-    <label>Técnico</label>
-    <input type="text" class="tecnico">
-
-    <label>Analista</label>
-    <input type="text" class="analista">
-  `;
-
-  document.getElementById("equipamentos").appendChild(div);
-  adicionarFoto(contador);
-}
-
-function adicionarFoto(id) {
-  const container = document.getElementById("fotos_" + id);
-  const index = container.children.length;
-
-  const div = document.createElement("div");
-
-  div.innerHTML = `
-    <input type="file" accept="image/*" onchange="previewImagem(event, '${id}_${index}')">
-    <img id="preview_${id}_${index}" style="display:none;">
-  `;
-
-  container.appendChild(div);
-}
-
-function previewImagem(event, id) {
-  const img = document.getElementById("preview_" + id);
-  const file = event.target.files[0];
-
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      img.src = e.target.result;
-      img.style.display = "block";
-    };
-    reader.readAsDataURL(file);
-  }
-}
-
 function imprimirChecklist() {
+  const conteudo = document.getElementById("conteudo").innerHTML;
 
-  let html = `
-  <html>
-  <head>
-  <style>
+  const janela = window.open('', '', 'width=900,height=700');
 
-    @page {
-      margin: 100px 40px 60px 40px;
-    }
+  janela.document.write(`
+    <html>
+    <head>
+      <title>Relatório Técnico</title>
 
-    body {
-      font-family: Arial;
-    }
+      <style>
+        body {
+          font-family: Arial;
+          margin: 0;
+          padding: 0;
+        }
 
-    header {
-      position: fixed;
-      top: -80px;
-      left: 0;
-      right: 0;
-      height: 60px;
-      text-align: center;
-      border-bottom: 2px solid #000;
-    }
+        header {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 60px;
+          text-align: center;
+          border-bottom: 2px solid #000;
+          background: #fff;
+          font-weight: bold;
+          font-size: 18px;
+          line-height: 60px;
+        }
 
-    header h2 {
-      margin: 0;
-      line-height: 60px;
-    }
+        main {
+          margin-top: 80px;
+          padding: 20px;
+        }
 
-    footer {
-      position: fixed;
-      bottom: -40px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      font-size: 12px;
-    }
+        .primeira-pagina {
+          margin-bottom: 30px;
+        }
 
-    .pagenum:before {
-      content: counter(page);
-    }
+        .equipamento {
+          page-break-inside: avoid;
+          margin-bottom: 30px;
+        }
 
-    .bloco {
-      page-break-inside: avoid;
-      margin-bottom: 20px;
-    }
+        img {
+          display: block;
+          margin: 20px auto;
+          max-width: 500px;
+          max-height: 400px;
+          border: 1px solid #ccc;
+        }
 
-    .foto {
-      display: block;
-      margin: 15px auto;
-      max-width: 500px;
-      max-height: 400px;
-      object-fit: contain;
-      border: 1px solid #ccc;
-      padding: 5px;
-    }
+        footer {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          text-align: right;
+          font-size: 12px;
+          border-top: 1px solid #000;
+        }
 
-    hr {
-      margin: 20px 0;
-    }
+        .page-number:after {
+          content: counter(page);
+        }
 
-  </style>
-  </head>
+        @media print {
+          footer {
+            position: fixed;
+          }
+        }
+      </style>
+    </head>
 
-  <body>
+    <body>
 
-  <header>
-    <h2>Relatório Técnico de Equipamentos</h2>
-  </header>
+      <header>
+        Relatório Técnico de Equipamentos
+      </header>
 
-  <footer>
-    Página <span class="pagenum"></span>
-  </footer>
+      <main>
 
-  <main>
+        <!-- ✅ DADOS APENAS NA PRIMEIRA PÁGINA -->
+        <div class="primeira-pagina">
+          <p><strong>Projeto:</strong> REFIT</p>
+          <p><strong>Loja:</strong> 238</p>
+          <p><strong>Responsável:</strong> Diego</p>
+          <p><strong>Data:</strong> 27/03/2026, 09:31:28</p>
+          <p><strong>Início:</strong> 01/01/2026</p>
+          <p><strong>Término:</strong> 03/02/2026</p>
+          <hr>
+        </div>
 
-  <p><strong>Projeto:</strong> ${document.getElementById("projeto").value}</p>
-  <p><strong>Loja:</strong> ${document.getElementById("loja").value}</p>
-  <p><strong>Responsável:</strong> ${document.getElementById("responsavel").value}</p>
-  <p><strong>Data:</strong> ${document.getElementById("data").value}</p>
-  <p><strong>Início:</strong> ${document.getElementById("inicio").value}</p>
-  <p><strong>Término:</strong> ${document.getElementById("fim").value}</p>
-  `;
+        <!-- ✅ CONTEÚDO DINÂMICO -->
+        ${conteudo}
 
-  const equipamentos = document.querySelectorAll("#equipamentos .card");
+      </main>
 
-  equipamentos.forEach((eq, i) => {
+      <footer>
+        Página <span class="page-number"></span>
+      </footer>
 
-    const nome = eq.querySelector(".nome").value;
-    const status = eq.querySelector(".status").value;
-    const obs = eq.querySelector(".obs").value;
-    const tecnico = eq.querySelector(".tecnico").value;
-    const analista = eq.querySelector(".analista").value;
+    </body>
+    </html>
+  `);
 
-    html += `<div class="bloco">`;
+  janela.document.close();
+  janela.focus();
 
-    html += `
-      <hr>
-      <h3>Equipamento ${i + 1}</h3>
-      <p><strong>Nome:</strong> ${nome}</p>
-      <p><strong>Status:</strong> ${status}</p>
-      <p><strong>Observações:</strong> ${obs}</p>
-      <p><strong>Técnico:</strong> ${tecnico}</p>
-      <p><strong>Analista:</strong> ${analista}</p>
-    `;
-
-    const imgs = eq.querySelectorAll("img");
-
-    imgs.forEach(img => {
-      if (img.src) {
-        html += `<img src="${img.src}" class="foto">`;
-      }
-    });
-
-    html += `</div>`;
-  });
-
-  html += `</main></body></html>`;
-
-  const win = window.open("", "_blank");
-  win.document.write(html);
-  win.document.close();
-  win.print();
+  setTimeout(() => {
+    janela.print();
+  }, 500);
 }
-
-adicionarEquipamento();
-
 </script>
-
-</body>
-</html>
