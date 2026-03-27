@@ -1,144 +1,3 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>Checklist Profissional</title>
-
-<style>
-body {
-  font-family: Arial;
-  background: #eef1f5;
-  margin: 0;
-}
-
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
-}
-
-.card {
-  background: #fff;
-  padding: 20px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-input, textarea, select {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  margin-bottom: 12px;
-}
-
-button {
-  padding: 12px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  width: 100%;
-}
-
-.add { background: #28a745; color: white; }
-.print { background: #007bff; color: white; }
-
-img {
-  max-width: 100%;
-  margin-top: 10px;
-  display: none;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<h2>Checklist de Equipamentos</h2>
-
-<div class="card">
-<input id="projeto" placeholder="Projeto">
-<input id="loja" placeholder="Loja">
-<input id="responsavel" placeholder="Responsável">
-<input id="data" readonly>
-<input id="inicio" placeholder="Início">
-<input id="fim" placeholder="Término">
-</div>
-
-<div id="lista"></div>
-
-<button class="add" onclick="add()">+ Equipamento</button>
-<button class="print" onclick="printar()">Consolidar / Imprimir</button>
-
-</div>
-
-<script>
-document.getElementById("data").value = new Date().toLocaleString();
-
-let contador = 0;
-
-function add(){
-  contador++;
-
-  const div = document.createElement("div");
-  div.className = "card";
-
-  div.innerHTML = `
-    <h3>Equipamento ${contador}</h3>
-
-    <input placeholder="Nome" class="nome">
-
-    <select class="status">
-      <option>Funcionando</option>
-      <option>Com problema</option>
-      <option>Não funciona</option>
-    </select>
-
-    <input type="file" accept="image/*" onchange="img(event,this)">
-    <img>
-
-    <textarea placeholder="Observações" class="obs"></textarea>
-    <input placeholder="Técnico" class="tecnico">
-    <input placeholder="Analista" class="analista">
-  `;
-
-  document.getElementById("lista").appendChild(div);
-}
-
-// 🔥 REDUZ IMAGEM AUTOMATICAMENTE
-function img(e,input){
-  const file = e.target.files[0];
-  const imgTag = input.nextElementSibling;
-
-  if(file){
-    const reader = new FileReader();
-
-    reader.onload = function(ev){
-      const image = new Image();
-      image.src = ev.target.result;
-
-      image.onload = function(){
-        const canvas = document.createElement("canvas");
-        const scale = 0.5; // 🔥 reduz 50%
-
-        canvas.width = image.width * scale;
-        canvas.height = image.height * scale;
-
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-
-        const compressed = canvas.toDataURL("image/jpeg", 0.7); // 🔥 compressão
-
-        imgTag.src = compressed;
-        imgTag.style.display = "block";
-      };
-    };
-
-    reader.readAsDataURL(file);
-  }
-}
-
 function printar(){
 
   let html = "";
@@ -146,7 +5,7 @@ function printar(){
   document.querySelectorAll(".card").forEach((c,i)=>{
     if(c.querySelector(".nome")){
       html += `
-        <div style="background:#fff;padding:15px;border-radius:8px;margin-bottom:20px;">
+        <div class="bloco">
         <h3>Equipamento ${i}</h3>
         <p><b>Nome:</b> ${c.querySelector(".nome").value}</p>
         <p><b>Status:</b> ${c.querySelector(".status").value}</p>
@@ -157,7 +16,7 @@ function printar(){
 
       const img = c.querySelector("img");
       if(img && img.src){
-        html += `<img src="${img.src}" style="width:50%;display:block;margin:auto;">`;
+        html += `<img src="${img.src}">`;
       }
 
       html += `</div>`;
@@ -168,24 +27,78 @@ function printar(){
 
   w.document.write(`
     <html>
-    <body style="font-family:Arial;background:#ddd;padding:20px;">
+    <head>
+    <style>
 
-    <div style="background:#fff;padding:20px;border-radius:10px;">
+      body {
+        font-family: Arial;
+        background: #ddd;
+        margin: 0;
+      }
 
-    <h2 style="text-align:center">Relatório Técnico</h2>
+      .pagina {
+        background: #fff;
+        padding: 20px;
+        margin: 20px auto;
+        max-width: 800px;
+      }
 
-    <p>Projeto: ${projeto.value}</p>
-    <p>Loja: ${loja.value}</p>
-    <p>Responsável: ${responsavel.value}</p>
-    <p>Data: ${data.value}</p>
-    <p>Início: ${inicio.value}</p>
-    <p>Término: ${fim.value}</p>
+      .bloco {
+        margin-bottom: 20px;
+        page-break-inside: avoid; /* 🔥 EVITA QUEBRAR EQUIPAMENTO */
+      }
 
-    <hr>
+      img {
+        width: 50%;
+        display: block;
+        margin: 10px auto;
+      }
 
-    ${html}
+      h2 {
+        text-align: center;
+        margin-bottom: 10px;
+      }
 
-    </div>
+      .info p {
+        margin: 3px 0;
+      }
+
+      @media print {
+
+        body {
+          background: white;
+        }
+
+        .pagina {
+          margin: 0;
+          box-shadow: none;
+        }
+
+      }
+
+    </style>
+    </head>
+
+    <body>
+
+      <div class="pagina">
+
+        <h2>Relatório Técnico</h2>
+
+        <div class="info">
+          <p>Projeto: ${projeto.value}</p>
+          <p>Loja: ${loja.value}</p>
+          <p>Responsável: ${responsavel.value}</p>
+          <p>Data: ${data.value}</p>
+          <p>Início: ${inicio.value}</p>
+          <p>Término: ${fim.value}</p>
+        </div>
+
+        <hr>
+
+        ${html}
+
+      </div>
 
     </body>
     </html>
@@ -194,9 +107,3 @@ function printar(){
   w.document.close();
   setTimeout(()=>w.print(),500);
 }
-
-add();
-</script>
-
-</body>
-</html>
