@@ -1,104 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Checklist</title>
-
-<style>
-body { font-family: Arial; margin:20px; }
-.card { border:1px solid #ccc; padding:10px; margin-bottom:10px; }
-button { padding:10px; margin-top:10px; }
-img { max-width:100%; }
-</style>
-
+<title>Teste OK</title>
 </head>
 
 <body>
 
-<h2>Checklist</h2>
-
-<p>Projeto: <input id="projeto"></p>
-<p>Loja: <input id="loja"></p>
-<p>Responsável: <input id="responsavel"></p>
-<p>Data: <input id="data" readonly></p>
-
-<div id="lista"></div>
-
-<button onclick="add()">Adicionar Equipamento</button>
-<button onclick="printar()">Imprimir</button>
-
-<script>
-document.getElementById("data").value = new Date().toLocaleString();
-
-function add(){
-  const div = document.createElement("div");
-  div.className="card";
-
-  div.innerHTML = `
-    <input placeholder="Equipamento" class="nome"><br>
-    <input type="file" onchange="img(event,this)">
-    <img style="display:none"><br>
-    <textarea placeholder="Obs" class="obs"></textarea>
-  `;
-
-  document.getElementById("lista").appendChild(div);
-}
-
-function img(e,input){
-  const img = input.nextElementSibling;
-  const file = e.target.files[0];
-
-  if(file){
-    const r = new FileReader();
-    r.onload = ev => {
-      img.src = ev.target.result;
-      img.style.display="block";
-    };
-    r.readAsDataURL(file);
-  }
-}
-
-function printar(){
-
-  let html="";
-
-  document.querySelectorAll(".card").forEach((c,i)=>{
-    html += `<h3>Equipamento ${i+1}</h3>`;
-    html += `<p>${c.querySelector(".nome").value}</p>`;
-    html += `<p>${c.querySelector(".obs").value}</p>`;
-
-    const img = c.querySelector("img");
-    if(img.src){
-      html += `<img src="${img.src}" style="max-width:300px">`;
-    }
-  });
-
-  const w = window.open();
-
-  w.document.write(`
-    <html>
-    <body>
-    <h2>Relatório</h2>
-
-    <p>Projeto: ${projeto.value}</p>
-    <p>Loja: ${loja.value}</p>
-    <p>Responsável: ${responsavel.value}</p>
-    <p>Data: ${data.value}</p>
-
-    <hr>
-
-    ${html}
-
-    </body>
-    </html>
-  `);
-
-  w.document.close();
-  setTimeout(()=>w.print(),500);
-}
-
-add();
-</script>
+<h1 style="text-align:center">SITE FUNCIONANDO ✅</h1>
 
 </body>
 </html>
