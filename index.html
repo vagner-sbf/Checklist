@@ -4,22 +4,34 @@ function printar(){
 
   document.querySelectorAll(".card").forEach((c,i)=>{
     if(c.querySelector(".nome")){
-      html += `
-        <div class="bloco">
-        <h3>Equipamento ${i}</h3>
-        <p><b>Nome:</b> ${c.querySelector(".nome").value}</p>
-        <p><b>Status:</b> ${c.querySelector(".status").value}</p>
-        <p><b>Obs:</b> ${c.querySelector(".obs").value}</p>
-        <p><b>Técnico:</b> ${c.querySelector(".tecnico").value}</p>
-        <p><b>Analista:</b> ${c.querySelector(".analista").value}</p>
-      `;
 
       const img = c.querySelector("img");
-      if(img && img.src){
-        html += `<img src="${img.src}">`;
-      }
 
-      html += `</div>`;
+      html += `
+        <div class="bloco">
+
+          <div class="linha">
+
+            <div class="texto">
+              <h3>Equipamento ${i}</h3>
+              <p><b>Nome:</b> ${c.querySelector(".nome").value}</p>
+              <p><b>Status:</b> ${c.querySelector(".status").value}</p>
+              <p><b>Obs:</b> ${c.querySelector(".obs").value}</p>
+            </div>
+
+            <div class="foto">
+              ${img && img.src ? `<img src="${img.src}">` : ""}
+            </div>
+
+          </div>
+
+          <div class="rodape">
+            <p><b>Técnico:</b> ${c.querySelector(".tecnico").value}</p>
+            <p><b>Analista:</b> ${c.querySelector(".analista").value}</p>
+          </div>
+
+        </div>
+      `;
     }
   });
 
@@ -43,28 +55,51 @@ function printar(){
         max-width: 800px;
       }
 
-      .bloco {
-        margin-bottom: 20px;
-        page-break-inside: avoid; /* 🔥 EVITA QUEBRAR EQUIPAMENTO */
-      }
-
-      img {
-        width: 50%;
-        display: block;
-        margin: 10px auto;
-      }
-
       h2 {
         text-align: center;
-        margin-bottom: 10px;
       }
 
       .info p {
         margin: 3px 0;
       }
 
-      @media print {
+      .bloco {
+        margin-bottom: 25px;
+        page-break-inside: avoid;
+      }
 
+      .linha {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+      }
+
+      .texto {
+        width: 60%;
+      }
+
+      .foto {
+        width: 40%;
+        text-align: right;
+      }
+
+      .foto img {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 6px;
+      }
+
+      .rodape {
+        text-align: center;
+        margin-top: 10px;
+      }
+
+      .rodape p {
+        margin: 3px 0;
+      }
+
+      @media print {
         body {
           background: white;
         }
@@ -73,7 +108,6 @@ function printar(){
           margin: 0;
           box-shadow: none;
         }
-
       }
 
     </style>
