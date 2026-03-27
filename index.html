@@ -140,16 +140,39 @@ function add() {
   document.getElementById("lista").appendChild(div);
 }
 
+// 🔥 COMPRESSÃO DE IMAGEM
 function preview(e, input) {
   const img = input.nextElementSibling;
   const file = e.target.files[0];
 
   if (file) {
     const reader = new FileReader();
-    reader.onload = function(ev) {
-      img.src = ev.target.result;
-      img.style.display = "block";
+
+    reader.onload = function(event) {
+      const image = new Image();
+      image.src = event.target.result;
+
+      image.onload = function() {
+        const canvas = document.createElement("canvas");
+        const maxWidth = 800;
+
+        let scale = maxWidth / image.width;
+        let width = maxWidth;
+        let height = image.height * scale;
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(image, 0, 0, width, height);
+
+        const compressed = canvas.toDataURL("image/jpeg", 0.7);
+
+        img.src = compressed;
+        img.style.display = "block";
+      };
     };
+
     reader.readAsDataURL(file);
   }
 }
@@ -161,7 +184,7 @@ function printar() {
   document.querySelectorAll(".card").forEach((c,i)=>{
     if(c.querySelector(".nome")){
       conteudo += `
-        <div style="margin-bottom:20px;">
+        <div style="page-break-inside: avoid; margin-bottom:30px;">
         <h3>Equipamento ${i}</h3>
         <p><b>Nome:</b> ${c.querySelector(".nome").value}</p>
         <p><b>Status:</b> ${c.querySelector(".status").value}</p>
@@ -172,7 +195,16 @@ function printar() {
 
       const img = c.querySelector("img");
       if(img && img.src){
-        conteudo += `<img src="${img.src}" style="max-width:500px;display:block;margin:auto;">`;
+        conteudo += `
+          <div style="text-align:center; page-break-inside: avoid;">
+            <img src="${img.src}" style="
+              max-width: 90%;
+              max-height: 600px;
+              object-fit: contain;
+              margin-top:10px;
+            ">
+          </div>
+        `;
       }
 
       conteudo += `</div><hr>`;
@@ -183,7 +215,17 @@ function printar() {
 
   w.document.write(`
     <html>
-    <body style="font-family:Arial;padding:20px">
+    <head>
+      <style>
+        body { font-family: Arial; padding: 20px; }
+
+        img {
+          display: block;
+          margin: auto;
+        }
+      </style>
+    </head>
+    <body>
 
     <h2 style="text-align:center">Relatório Técnico</h2>
 
@@ -206,7 +248,6 @@ function printar() {
   setTimeout(()=>w.print(),500);
 }
 
-// já inicia com 1 equipamento
 add();
 </script>
 
