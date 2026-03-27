@@ -1,32 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Checklist de Equipamentos</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #f4f4f4;
+  margin: 20px;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+}
+
+.card {
+  background: #fff;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin-top: 10px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 12px;
+  border: none;
+  cursor: pointer;
+}
+
+.add-btn { background: green; color: white; width: 100%; }
+.print-btn { background: #007bff; color: white; width: 100%; }
+
+img {
+  max-width: 100%;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Checklist de Equipamentos</h2>
+
+<div class="card">
+
+<label>Projeto</label>
+<input type="text" id="projeto">
+
+<label>Loja</label>
+<input type="text" id="loja">
+
+<label>Responsável</label>
+<input type="text" id="responsavel">
+
+<label>Data</label>
+<input type="text" id="data" readonly>
+
+<label>Início do Atendimento</label>
+<input type="text" id="inicio">
+
+<label>Término do Atendimento</label>
+<input type="text" id="fim">
+
+</div>
+
+<div id="equipamentos"></div>
+
+<button class="add-btn" onclick="adicionarEquipamento()">+ Equipamento</button>
+<button class="print-btn" onclick="imprimirChecklist()">Consolidar / Imprimir</button>
+
+</div>
+
 <script>
+let contador = 0;
+
+document.getElementById("data").value = new Date().toLocaleString();
+
+function adicionarEquipamento() {
+  contador++;
+
+  const div = document.createElement("div");
+  div.classList.add("card", "equipamento");
+
+  div.innerHTML = `
+    <h3>Equipamento ${contador}</h3>
+
+    <label>Nome</label>
+    <input type="text" class="nome">
+
+    <label>Status</label>
+    <select class="status">
+      <option>Funcionando</option>
+      <option>Com problema</option>
+      <option>Não funciona</option>
+    </select>
+
+    <label>Fotos</label>
+    <div class="fotos"></div>
+    <button type="button" onclick="adicionarFoto(this)">+ Foto</button>
+
+    <label>Observações</label>
+    <textarea class="obs"></textarea>
+
+    <label>Técnico</label>
+    <input type="text" class="tecnico">
+
+    <label>Analista</label>
+    <input type="text" class="analista">
+  `;
+
+  document.getElementById("equipamentos").appendChild(div);
+  adicionarFoto(div);
+}
+
+function adicionarFoto(container) {
+  const fotosDiv = container.querySelector(".fotos");
+
+  const div = document.createElement("div");
+
+  div.innerHTML = `
+    <input type="file" accept="image/*" onchange="previewImagem(event, this)">
+    <img style="display:none;">
+  `;
+
+  fotosDiv.appendChild(div);
+}
+
+function previewImagem(event, input) {
+  const img = input.nextElementSibling;
+  const file = event.target.files[0];
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      img.src = e.target.result;
+      img.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
 function imprimirChecklist() {
 
-  const elemento = document.getElementById("conteudo");
+  const equipamentos = document.querySelectorAll(".equipamento");
 
-  if (!elemento) {
-    alert("Erro: elemento 'conteudo' não encontrado.");
-    return;
-  }
+  let conteudo = "";
 
-  const conteudo = elemento.innerHTML;
+  equipamentos.forEach((eq, i) => {
+
+    const nome = eq.querySelector(".nome").value;
+    const status = eq.querySelector(".status").value;
+    const obs = eq.querySelector(".obs").value;
+    const tecnico = eq.querySelector(".tecnico").value;
+    const analista = eq.querySelector(".analista").value;
+
+    conteudo += `
+      <div style="page-break-inside: avoid; margin-bottom: 30px;">
+        <hr>
+        <h3>Equipamento ${i + 1}</h3>
+        <p><strong>Nome:</strong> ${nome}</p>
+        <p><strong>Status:</strong> ${status}</p>
+        <p><strong>Observações:</strong> ${obs}</p>
+        <p><strong>Técnico:</strong> ${tecnico}</p>
+        <p><strong>Analista:</strong> ${analista}</p>
+    `;
+
+    const imgs = eq.querySelectorAll("img");
+
+    imgs.forEach(img => {
+      if (img.src) {
+        conteudo += `<img src="${img.src}" style="display:block;margin:20px auto;max-width:500px;max-height:400px;border:1px solid #ccc;">`;
+      }
+    });
+
+    conteudo += `</div>`;
+  });
 
   const janela = window.open('', '_blank');
-
-  if (!janela) {
-    alert("Pop-up bloqueado. Permita pop-ups para funcionar.");
-    return;
-  }
 
   janela.document.write(`
     <html>
     <head>
-      <title>Relatório Técnico</title>
-
       <style>
-        body {
-          font-family: Arial;
-          margin: 0;
-        }
+        body { font-family: Arial; }
 
         header {
           position: fixed;
@@ -38,20 +210,12 @@ function imprimirChecklist() {
           border-bottom: 2px solid #000;
           background: #fff;
           font-weight: bold;
-          font-size: 18px;
           line-height: 60px;
         }
 
         main {
           margin-top: 80px;
           padding: 20px;
-        }
-
-        img {
-          display: block;
-          margin: 20px auto;
-          max-width: 500px;
-          max-height: 400px;
         }
 
         footer {
@@ -75,14 +239,16 @@ function imprimirChecklist() {
 
       <main>
 
-        <p><strong>Projeto:</strong> REFIT</p>
-        <p><strong>Loja:</strong> 238</p>
-        <p><strong>Responsável:</strong> Diego</p>
-        <p><strong>Data:</strong> 27/03/2026, 09:31:28</p>
-        <p><strong>Início:</strong> 01/01/2026</p>
-        <p><strong>Término:</strong> 03/02/2026</p>
-
-        <hr>
+        <!-- PRIMEIRA PÁGINA -->
+        <div>
+          <p><strong>Projeto:</strong> ${document.getElementById("projeto").value}</p>
+          <p><strong>Loja:</strong> ${document.getElementById("loja").value}</p>
+          <p><strong>Responsável:</strong> ${document.getElementById("responsavel").value}</p>
+          <p><strong>Data:</strong> ${document.getElementById("data").value}</p>
+          <p><strong>Início:</strong> ${document.getElementById("inicio").value}</p>
+          <p><strong>Término:</strong> ${document.getElementById("fim").value}</p>
+          <hr>
+        </div>
 
         ${conteudo}
 
@@ -102,4 +268,9 @@ function imprimirChecklist() {
     janela.print();
   }, 500);
 }
+
+adicionarEquipamento();
 </script>
+
+</body>
+</html>
