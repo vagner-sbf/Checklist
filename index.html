@@ -7,7 +7,7 @@ function imprimirChecklist() {
   equipamentos.forEach((eq, i) => {
 
     conteudo += `
-      <div class="equipamento-bloco ${i === 0 ? 'primeiro' : ''}">
+      <div class="equipamento-bloco">
         <hr>
         <h3>Equipamento ${i + 1}</h3>
         <p><strong>Nome:</strong> ${eq.querySelector(".nome").value}</p>
@@ -19,9 +19,7 @@ function imprimirChecklist() {
 
     eq.querySelectorAll("img").forEach(img => {
       if (img.src) {
-        conteudo += `
-          <img src="${img.src}">
-        `;
+        conteudo += `<img src="${img.src}">`;
       }
     });
 
@@ -39,21 +37,26 @@ function imprimirChecklist() {
           margin: 0;
         }
 
+        /* ✅ HEADER EM TODAS AS PÁGINAS */
         header {
           position: fixed;
           top: 0;
           left: 0;
           right: 0;
-          height: 60px;
-          text-align: center;
+          height: 110px;
           border-bottom: 2px solid #000;
           background: #fff;
-          font-weight: bold;
-          line-height: 60px;
+          padding: 10px 20px;
+          font-size: 13px;
+        }
+
+        header h2 {
+          text-align: center;
+          margin: 0 0 5px 0;
         }
 
         main {
-          margin-top: 70px;
+          margin-top: 120px;
           padding: 15px;
         }
 
@@ -68,21 +71,9 @@ function imprimirChecklist() {
           content: counter(page);
         }
 
-        .dados {
-          margin-bottom: 10px;
-        }
-
-        /* 🔥 CORREÇÃO PRINCIPAL */
         .equipamento-bloco {
           margin-bottom: 20px;
           page-break-inside: auto;
-          break-inside: auto;
-        }
-
-        /* 🚀 GARANTE QUE O PRIMEIRO NÃO PULE */
-        .primeiro {
-          page-break-before: avoid !important;
-          break-before: avoid !important;
         }
 
         img {
@@ -97,24 +88,20 @@ function imprimirChecklist() {
 
     <body>
 
+      <!-- ✅ AGORA REPETE EM TODAS AS PÁGINAS -->
       <header>
-        Relatório Técnico de Equipamentos
+        <h2>Relatório Técnico de Equipamentos</h2>
+
+        <p><strong>Projeto:</strong> REFIT</p>
+        <p><strong>Loja:</strong> CE123</p>
+        <p><strong>Responsável:</strong> Fulano</p>
+        <p><strong>Data:</strong> 27/03/2026, 10:10:04</p>
+        <p><strong>Início:</strong> 01/01/2026</p>
+        <p><strong>Término:</strong> 03/02/2026</p>
       </header>
 
       <main>
-
-        <!-- ✅ DADOS PRIMEIRA PÁGINA -->
-        <div class="dados">
-          <p><strong>Projeto:</strong> REFIT</p>
-          <p><strong>Loja:</strong> CE123</p>
-          <p><strong>Responsável:</strong> Fulano</p>
-          <p><strong>Data:</strong> 27/03/2026, 10:10:04</p>
-          <p><strong>Início:</strong> 01/01/2026</p>
-          <p><strong>Término:</strong> 03/02/2026</p>
-        </div>
-
         ${conteudo}
-
       </main>
 
       <footer>
