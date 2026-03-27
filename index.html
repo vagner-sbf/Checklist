@@ -17,10 +17,6 @@ body {
   padding: 20px;
 }
 
-h2 {
-  text-align: center;
-}
-
 .card {
   background: #fff;
   padding: 20px;
@@ -34,8 +30,6 @@ input, textarea, select {
   padding: 10px;
   margin-top: 8px;
   margin-bottom: 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
 }
 
 button {
@@ -44,24 +38,15 @@ button {
   border-radius: 6px;
   cursor: pointer;
   width: 100%;
-  font-size: 16px;
 }
 
-.add {
-  background: #28a745;
-  color: white;
-}
-
-.print {
-  background: #007bff;
-  color: white;
-}
+.add { background: #28a745; color: white; }
+.print { background: #007bff; color: white; }
 
 img {
   max-width: 100%;
   margin-top: 10px;
   display: none;
-  border-radius: 6px;
 }
 </style>
 </head>
@@ -73,28 +58,17 @@ img {
 <h2>Checklist de Equipamentos</h2>
 
 <div class="card">
-<label>Projeto</label>
-<input id="projeto">
-
-<label>Loja</label>
-<input id="loja">
-
-<label>Responsável</label>
-<input id="responsavel">
-
-<label>Data</label>
+<input id="projeto" placeholder="Projeto">
+<input id="loja" placeholder="Loja">
+<input id="responsavel" placeholder="Responsável">
 <input id="data" readonly>
-
-<label>Início</label>
-<input id="inicio">
-
-<label>Término</label>
-<input id="fim">
+<input id="inicio" placeholder="Início">
+<input id="fim" placeholder="Término">
 </div>
 
 <div id="lista"></div>
 
-<button class="add" onclick="add()">+ Adicionar Equipamento</button>
+<button class="add" onclick="add()">+ Equipamento</button>
 <button class="print" onclick="printar()">Consolidar / Imprimir</button>
 
 </div>
@@ -104,7 +78,7 @@ document.getElementById("data").value = new Date().toLocaleString();
 
 let contador = 0;
 
-function add() {
+function add(){
   contador++;
 
   const div = document.createElement("div");
@@ -113,63 +87,51 @@ function add() {
   div.innerHTML = `
     <h3>Equipamento ${contador}</h3>
 
-    <label>Nome</label>
-    <input class="nome">
+    <input placeholder="Nome" class="nome">
 
-    <label>Status</label>
     <select class="status">
       <option>Funcionando</option>
       <option>Com problema</option>
       <option>Não funciona</option>
     </select>
 
-    <label>Foto</label>
-    <input type="file" accept="image/*" onchange="preview(event,this)">
+    <input type="file" accept="image/*" onchange="img(event,this)">
     <img>
 
-    <label>Observações</label>
-    <textarea class="obs"></textarea>
-
-    <label>Técnico</label>
-    <input class="tecnico">
-
-    <label>Analista</label>
-    <input class="analista">
+    <textarea placeholder="Observações" class="obs"></textarea>
+    <input placeholder="Técnico" class="tecnico">
+    <input placeholder="Analista" class="analista">
   `;
 
   document.getElementById("lista").appendChild(div);
 }
 
-// 🔥 COMPRESSÃO DE IMAGEM
-function preview(e, input) {
-  const img = input.nextElementSibling;
+// 🔥 REDUZ IMAGEM AUTOMATICAMENTE
+function img(e,input){
   const file = e.target.files[0];
+  const imgTag = input.nextElementSibling;
 
-  if (file) {
+  if(file){
     const reader = new FileReader();
 
-    reader.onload = function(event) {
+    reader.onload = function(ev){
       const image = new Image();
-      image.src = event.target.result;
+      image.src = ev.target.result;
 
-      image.onload = function() {
+      image.onload = function(){
         const canvas = document.createElement("canvas");
-        const maxWidth = 800;
+        const scale = 0.5; // 🔥 reduz 50%
 
-        let scale = maxWidth / image.width;
-        let width = maxWidth;
-        let height = image.height * scale;
-
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = image.width * scale;
+        canvas.height = image.height * scale;
 
         const ctx = canvas.getContext("2d");
-        ctx.drawImage(image, 0, 0, width, height);
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-        const compressed = canvas.toDataURL("image/jpeg", 0.7);
+        const compressed = canvas.toDataURL("image/jpeg", 0.7); // 🔥 compressão
 
-        img.src = compressed;
-        img.style.display = "block";
+        imgTag.src = compressed;
+        imgTag.style.display = "block";
       };
     };
 
@@ -177,14 +139,14 @@ function preview(e, input) {
   }
 }
 
-function printar() {
+function printar(){
 
-  let conteudo = "";
+  let html = "";
 
   document.querySelectorAll(".card").forEach((c,i)=>{
     if(c.querySelector(".nome")){
-      conteudo += `
-        <div style="page-break-inside: avoid; margin-bottom:30px;">
+      html += `
+        <div style="background:#fff;padding:15px;border-radius:8px;margin-bottom:20px;">
         <h3>Equipamento ${i}</h3>
         <p><b>Nome:</b> ${c.querySelector(".nome").value}</p>
         <p><b>Status:</b> ${c.querySelector(".status").value}</p>
@@ -195,19 +157,10 @@ function printar() {
 
       const img = c.querySelector("img");
       if(img && img.src){
-        conteudo += `
-          <div style="text-align:center; page-break-inside: avoid;">
-            <img src="${img.src}" style="
-              max-width: 90%;
-              max-height: 600px;
-              object-fit: contain;
-              margin-top:10px;
-            ">
-          </div>
-        `;
+        html += `<img src="${img.src}" style="width:50%;display:block;margin:auto;">`;
       }
 
-      conteudo += `</div><hr>`;
+      html += `</div>`;
     }
   });
 
@@ -215,17 +168,9 @@ function printar() {
 
   w.document.write(`
     <html>
-    <head>
-      <style>
-        body { font-family: Arial; padding: 20px; }
+    <body style="font-family:Arial;background:#ddd;padding:20px;">
 
-        img {
-          display: block;
-          margin: auto;
-        }
-      </style>
-    </head>
-    <body>
+    <div style="background:#fff;padding:20px;border-radius:10px;">
 
     <h2 style="text-align:center">Relatório Técnico</h2>
 
@@ -238,7 +183,9 @@ function printar() {
 
     <hr>
 
-    ${conteudo}
+    ${html}
+
+    </div>
 
     </body>
     </html>
