@@ -60,14 +60,14 @@ img {
 
 <div class="card">
 
+<label>Projeto</label>
+<input type="text" id="projeto">
+
 <label>Loja</label>
 <input type="text" id="loja">
 
 <label>Responsável</label>
 <input type="text" id="responsavel">
-
-<label>Data</label>
-<input type="text" id="data" readonly>
 
 <label>Início do Atendimento</label>
 <input type="text" id="inicio" placeholder="Digite data e hora de início">
@@ -86,9 +86,6 @@ img {
 
 <script>
 let contador = 0;
-
-/* DATA AUTOMÁTICA */
-document.getElementById("data").value = new Date().toLocaleString();
 
 /* ADICIONAR EQUIPAMENTO */
 function adicionarEquipamento() {
@@ -179,9 +176,9 @@ function imprimirChecklist() {
 
     <h2>Checklist de Equipamentos</h2>
 
+    <p><strong>Projeto:</strong> ${document.getElementById("projeto").value}</p>
     <p><strong>Loja:</strong> ${document.getElementById("loja").value}</p>
     <p><strong>Responsável:</strong> ${document.getElementById("responsavel").value}</p>
-    <p><strong>Data:</strong> ${document.getElementById("data").value}</p>
     <p><strong>Início:</strong> ${document.getElementById("inicio").value}</p>
     <p><strong>Término:</strong> ${document.getElementById("fim").value}</p>
   `;
