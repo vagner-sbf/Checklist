@@ -1,6 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Checklist</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #f0f0f0;
+  padding: 20px;
+}
+
+.container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+input, select, textarea {
+  width: 100%;
+  margin: 5px 0;
+  padding: 8px;
+}
+
+.card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-top: 15px;
+  border-radius: 8px;
+}
+
+img {
+  max-width: 150px;
+  display: none;
+  margin-top: 10px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px;
+  cursor: pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Checklist</h2>
+
+<input id="projeto" placeholder="Projeto">
+<input id="loja" placeholder="Loja">
+<input id="responsavel" placeholder="Responsável">
+
+<input id="data" readonly>
+<input id="inicio" placeholder="Data início">
+<input id="fim" placeholder="Data fim">
+
+<div id="lista"></div>
+
+<button onclick="add()">Adicionar Equipamento</button>
+<button onclick="printar()">Consolidar / Imprimir</button>
+
+</div>
+
 <script>
 
-document.getElementById("data").value = new Date().toLocaleString();
+window.onload = function(){
+  document.getElementById("data").value = new Date().toLocaleString();
+  add();
+}
 
 let contador = 0;
 
@@ -53,46 +124,42 @@ function printar(){
   let html = "";
 
   document.querySelectorAll(".card").forEach((c, i) => {
-    if (c.querySelector(".nome")) {
 
-      const nome = c.querySelector(".nome").value;
-      const status = c.querySelector(".status").value;
-      const obs = c.querySelector(".obs").value;
-      const tecnico = c.querySelector(".tecnico").value;
-      const analista = c.querySelector(".analista").value;
-      const img = c.querySelector("img");
+    const nome = c.querySelector(".nome").value;
+    const status = c.querySelector(".status").value;
+    const obs = c.querySelector(".obs").value;
+    const tecnico = c.querySelector(".tecnico").value;
+    const analista = c.querySelector(".analista").value;
+    const img = c.querySelector("img");
 
-      let imagemHTML = "";
-      if (img && img.src) {
-        imagemHTML = '<img src="' + img.src + '" style="max-width:100%; max-height:200px;">';
-      }
-
-      html += `
-        <table style="width:100%; margin-bottom:20px;">
-          <tr>
-
-            <td style="width:60%;">
-              <h3>Equipamento ${i}</h3>
-              <p><b>Nome:</b> ${nome}</p>
-              <p><b>Status:</b> ${status}</p>
-              <p><b>Obs:</b> ${obs}</p>
-            </td>
-
-            <td style="width:40%; text-align:center;">
-              ${imagemHTML}
-            </td>
-
-          </tr>
-
-          <tr>
-            <td colspan="2" style="text-align:center;">
-              <p><b>Técnico:</b> ${tecnico}</p>
-              <p><b>Analista:</b> ${analista}</p>
-            </td>
-          </tr>
-        </table>
-      `;
+    let imagemHTML = "";
+    if (img && img.src) {
+      imagemHTML = '<img src="' + img.src + '" style="max-width:200px;">';
     }
+
+    html += `
+      <table style="width:100%; margin-bottom:20px;">
+        <tr>
+          <td style="width:60%;">
+            <h3>Equipamento ${i+1}</h3>
+            <p><b>Nome:</b> ${nome}</p>
+            <p><b>Status:</b> ${status}</p>
+            <p><b>Obs:</b> ${obs}</p>
+          </td>
+
+          <td style="width:40%; text-align:center;">
+            ${imagemHTML}
+          </td>
+        </tr>
+
+        <tr>
+          <td colspan="2" style="text-align:center;">
+            <p><b>Técnico:</b> ${tecnico}</p>
+            <p><b>Analista:</b> ${analista}</p>
+          </td>
+        </tr>
+      </table>
+    `;
   });
 
   const w = window.open();
@@ -112,12 +179,12 @@ function printar(){
 
         <h2>Relatório Técnico</h2>
 
-        <p>Projeto: ${projeto.value}</p>
-        <p>Loja: ${loja.value}</p>
-        <p>Responsável: ${responsavel.value}</p>
-        <p>Data: ${data.value}</p>
-        <p>Início: ${inicio.value}</p>
-        <p>Término: ${fim.value}</p>
+        <p>Projeto: ${document.getElementById("projeto").value}</p>
+        <p>Loja: ${document.getElementById("loja").value}</p>
+        <p>Responsável: ${document.getElementById("responsavel").value}</p>
+        <p>Data: ${document.getElementById("data").value}</p>
+        <p>Início: ${document.getElementById("inicio").value}</p>
+        <p>Término: ${document.getElementById("fim").value}</p>
 
         <hr>
 
@@ -134,6 +201,7 @@ function printar(){
   setTimeout(()=>w.print(),500);
 }
 
-add();
-
 </script>
+
+</body>
+</html>
