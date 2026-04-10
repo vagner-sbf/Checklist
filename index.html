@@ -2,204 +2,230 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Checklist</title>
+<title>Checklist de Equipamentos</title>
 
 <style>
 body {
   font-family: Arial;
-  background: #f0f0f0;
-  padding: 20px;
+  background: #f4f4f4;
+  margin: 20px;
 }
 
 .container {
+  max-width: 800px;
+  margin: auto;
+}
+
+.card {
   background: #fff;
-  padding: 20px;
+  padding: 15px;
+  margin-bottom: 15px;
   border-radius: 10px;
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin-top: 10px;
 }
 
 input, select, textarea {
   width: 100%;
-  margin: 5px 0;
   padding: 8px;
-}
-
-.card {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin-top: 15px;
-  border-radius: 8px;
-}
-
-img {
-  max-width: 150px;
-  display: none;
-  margin-top: 10px;
+  margin-top: 5px;
 }
 
 button {
   margin-top: 10px;
-  padding: 10px;
+  padding: 12px;
+  border: none;
   cursor: pointer;
 }
-</style>
 
+.add-btn { background: green; color: white; width: 100%; }
+.print-btn { background: #007bff; color: white; width: 100%; }
+
+img {
+  max-width: 100%;
+  margin-top: 10px;
+}
+</style>
 </head>
 
 <body>
 
 <div class="container">
 
-<h2>Checklist</h2>
+<h2>Checklist de Equipamentos</h2>
 
-<input id="projeto" placeholder="Projeto">
-<input id="loja" placeholder="Loja">
-<input id="responsavel" placeholder="Responsável">
+<div class="card">
 
-<input id="data" readonly>
-<input id="inicio" placeholder="Data início">
-<input id="fim" placeholder="Data fim">
+<label>Loja</label>
+<input type="text" id="loja">
 
-<div id="lista"></div>
+<label>Responsável</label>
+<input type="text" id="responsavel">
 
-<button onclick="add()">Adicionar Equipamento</button>
-<button onclick="printar()">Consolidar / Imprimir</button>
+<label>Data</label>
+<input type="text" id="data" readonly>
+
+<label>Início do Atendimento</label>
+<input type="text" id="inicio" placeholder="Digite data e hora de início">
+
+<label>Término do Atendimento</label>
+<input type="text" id="fim" placeholder="Digite data e hora de término">
+
+</div>
+
+<div id="equipamentos"></div>
+
+<button class="add-btn" onclick="adicionarEquipamento()">+ Equipamento</button>
+<button class="print-btn" onclick="imprimirChecklist()">Consolidar / Imprimir</button>
 
 </div>
 
 <script>
-
-window.onload = function(){
-  document.getElementById("data").value = new Date().toLocaleString();
-  add();
-}
-
 let contador = 0;
 
-function add(){
+/* DATA AUTOMÁTICA */
+document.getElementById("data").value = new Date().toLocaleString();
+
+/* ADICIONAR EQUIPAMENTO */
+function adicionarEquipamento() {
   contador++;
 
   const div = document.createElement("div");
-  div.className = "card";
+  div.classList.add("card");
 
   div.innerHTML = `
     <h3>Equipamento ${contador}</h3>
 
-    <input placeholder="Nome" class="nome">
+    <label>Nome</label>
+    <input type="text" class="nome">
 
+    <label>Status</label>
     <select class="status">
       <option>Funcionando</option>
       <option>Com problema</option>
       <option>Não funciona</option>
     </select>
 
-    <input type="file" accept="image/*" onchange="img(event,this)">
-    <img>
+    <label>Fotos</label>
+    <div id="fotos_${contador}"></div>
+    <button type="button" onclick="adicionarFoto(${contador})">+ Foto</button>
 
-    <textarea placeholder="Observações" class="obs"></textarea>
-    <input placeholder="Técnico" class="tecnico">
-    <input placeholder="Analista" class="analista">
+    <label>Observações</label>
+    <textarea class="obs"></textarea>
+
+    <label>Técnico</label>
+    <input type="text" class="tecnico">
+
+    <label>Analista</label>
+    <input type="text" class="analista">
   `;
 
-  document.getElementById("lista").appendChild(div);
+  document.getElementById("equipamentos").appendChild(div);
+
+  adicionarFoto(contador);
 }
 
-function img(e,input){
-  const file = e.target.files[0];
-  const imgTag = input.nextElementSibling;
+/* ADICIONAR FOTO */
+function adicionarFoto(id) {
+  const container = document.getElementById("fotos_" + id);
+  const index = container.children.length;
 
-  if(file){
+  const div = document.createElement("div");
+
+  div.innerHTML = `
+    <input type="file" accept="image/*" onchange="previewImagem(event, '${id}_${index}')">
+    <img id="preview_${id}_${index}" style="display:none;">
+  `;
+
+  container.appendChild(div);
+}
+
+/* PREVIEW IMAGEM */
+function previewImagem(event, id) {
+  const img = document.getElementById("preview_" + id);
+  const file = event.target.files[0];
+
+  if (file) {
     const reader = new FileReader();
 
-    reader.onload = function(ev){
-      imgTag.src = ev.target.result;
-      imgTag.style.display = "block";
+    reader.onload = function(e) {
+      img.src = e.target.result;
+      img.style.display = "block";
     };
 
     reader.readAsDataURL(file);
   }
 }
 
-function printar(){
+/* CONSOLIDAR E IMPRIMIR */
+function imprimirChecklist() {
 
-  let html = "";
-
-  document.querySelectorAll(".card").forEach((c, i) => {
-
-    const nome = c.querySelector(".nome").value;
-    const status = c.querySelector(".status").value;
-    const obs = c.querySelector(".obs").value;
-    const tecnico = c.querySelector(".tecnico").value;
-    const analista = c.querySelector(".analista").value;
-    const img = c.querySelector("img");
-
-    let imagemHTML = "";
-    if (img && img.src) {
-      imagemHTML = '<img src="' + img.src + '" style="max-width:200px;">';
-    }
-
-    html += `
-      <table style="width:100%; margin-bottom:20px;">
-        <tr>
-          <td style="width:60%;">
-            <h3>Equipamento ${i+1}</h3>
-            <p><b>Nome:</b> ${nome}</p>
-            <p><b>Status:</b> ${status}</p>
-            <p><b>Obs:</b> ${obs}</p>
-          </td>
-
-          <td style="width:40%; text-align:center;">
-            ${imagemHTML}
-          </td>
-        </tr>
-
-        <tr>
-          <td colspan="2" style="text-align:center;">
-            <p><b>Técnico:</b> ${tecnico}</p>
-            <p><b>Analista:</b> ${analista}</p>
-          </td>
-        </tr>
-      </table>
-    `;
-  });
-
-  const w = window.open();
-
-  const pagina = `
+  let html = `
     <html>
     <head>
-      <meta charset="UTF-8">
+      <title>Checklist</title>
       <style>
-        body { font-family: Arial; background:#ddd; }
-        .pagina { background:#fff; padding:20px; margin:20px auto; max-width:800px; }
+        body { font-family: Arial; padding: 20px; }
+        h2 { text-align: center; }
+        img { max-width: 100%; margin-top: 10px; }
+        hr { margin: 20px 0; }
       </style>
     </head>
-
     <body>
-      <div class="pagina">
 
-        <h2>Relatório Técnico</h2>
+    <h2>Checklist de Equipamentos</h2>
 
-        <p>Projeto: ${document.getElementById("projeto").value}</p>
-        <p>Loja: ${document.getElementById("loja").value}</p>
-        <p>Responsável: ${document.getElementById("responsavel").value}</p>
-        <p>Data: ${document.getElementById("data").value}</p>
-        <p>Início: ${document.getElementById("inicio").value}</p>
-        <p>Término: ${document.getElementById("fim").value}</p>
-
-        <hr>
-
-        ${html}
-
-      </div>
-    </body>
-    </html>
+    <p><strong>Loja:</strong> ${document.getElementById("loja").value}</p>
+    <p><strong>Responsável:</strong> ${document.getElementById("responsavel").value}</p>
+    <p><strong>Data:</strong> ${document.getElementById("data").value}</p>
+    <p><strong>Início:</strong> ${document.getElementById("inicio").value}</p>
+    <p><strong>Término:</strong> ${document.getElementById("fim").value}</p>
   `;
 
-  w.document.write(pagina);
-  w.document.close();
+  const equipamentos = document.querySelectorAll("#equipamentos .card");
 
-  setTimeout(()=>w.print(),500);
+  equipamentos.forEach((eq, i) => {
+
+    const nome = eq.querySelector(".nome").value;
+    const status = eq.querySelector(".status").value;
+    const obs = eq.querySelector(".obs").value;
+    const tecnico = eq.querySelector(".tecnico").value;
+    const analista = eq.querySelector(".analista").value;
+
+    html += `
+      <hr>
+      <h3>Equipamento ${i + 1}</h3>
+      <p><strong>Nome:</strong> ${nome}</p>
+      <p><strong>Status:</strong> ${status}</p>
+      <p><strong>Observações:</strong> ${obs}</p>
+      <p><strong>Técnico:</strong> ${tecnico}</p>
+      <p><strong>Analista:</strong> ${analista}</p>
+    `;
+
+    const imgs = eq.querySelectorAll("img");
+
+    imgs.forEach(img => {
+      if (img.src) {
+        html += `<img src="${img.src}">`;
+      }
+    });
+
+  });
+
+  html += `</body></html>`;
+
+  const win = window.open("", "_blank");
+  win.document.write(html);
+  win.document.close();
+  win.print();
 }
+
+/* INICIA COM 1 EQUIPAMENTO */
+adicionarEquipamento();
 
 </script>
 
